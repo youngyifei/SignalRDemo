@@ -1,0 +1,5 @@
+D:\Project\SignalRDemo\SignalRDemo\bin\Debug\SignalRDemo.dll
+D:\Project\SignalRDemo\SignalRDemo\bin\Debug\SignalRDemo.pdb
+D:\Project\SignalRDemo\SignalRDemo\obj\Debug\SignalRDemo.csprojResolveAssemblyReference.cache
+D:\Project\SignalRDemo\SignalRDemo\obj\Debug\SignalRDemo.dll
+D:\Project\SignalRDemo\SignalRDemo\obj\Debug\SignalRDemo.pdb

@@ -1,0 +1,5 @@
+D:\Project\SignalRDemo\Model\bin\Debug\Model.dll
+D:\Project\SignalRDemo\Model\bin\Debug\Model.pdb
+D:\Project\SignalRDemo\Model\obj\Debug\Model.csprojResolveAssemblyReference.cache
+D:\Project\SignalRDemo\Model\obj\Debug\Model.dll
+D:\Project\SignalRDemo\Model\obj\Debug\Model.pdb

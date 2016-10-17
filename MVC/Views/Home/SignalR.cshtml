@@ -1,0 +1,124 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SignalR</title>
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <script src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script src="~/Scripts/jquery.signalR-2.2.1.min.js"></script>
+    <script src="~/signalr/hubs"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <style>
+        .hide-it {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="col-lg-12">
+        <h1>SignalR:</h1>
+        <div class="col-lg-6" id="form">
+            账号：<input type="text" class="form-control" name="userId" />
+            密码：<input type="password" class="form-control" name="password" />
+            <button id="submit" class="btn btn-primary"> 提交 </button>
+        </div>
+        <div class="hide-it col-lg-12" id="userinfo">
+            <h2></h2>
+            <div class="form-group">
+                <select name="userId" class="form-control"></select>
+                <input type="text" class="form-control" name="str" />
+                <button id="send" class="btn btn-success"> 发送</button>
+            </div>
+            <div class="col-lg-10" id="taskDiv">
+                <div class="col-lg-4">
+                    <fieldset>
+                        <legend>系统聊天框</legend>
+                        <div class="jumbotron">
+                            <ul class="taskText"></ul>
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <script>
+        $(function () {
+            var userTaskHub = $.connection.userTaskHub;
+            var _userId="@ViewBag.userId";
+            var _userName="@ViewBag.userName";
+            userTaskHub.client.helloMyFriend = function (userId,userName,data) {
+                sendHtml(userId, userName, data);
+            }
+            var sendHtml = function (userId, userName,str,isSelf) {
+                var div$;
+                var taskName = userId == _userId ? "系统" : userName;//聊天框名称
+                var name = taskName;//聊天昵称
+                if (isSelf) {
+                    name = _userName;
+                }
+                if ($('#task' + userId).length < 1) {
+                    $("#taskDiv").append(" <div class=\"col-lg-4\"><fieldset>" +
+                    "<legend>" + taskName + "聊天框</legend>" +
+                    "<div class=\"jumbotron\">" +
+                        "<ul class=\"taskText\" id=\"task"+userId+"\"></ul>" +
+                    "</div>" +
+                    "</fieldset></div>");
+                }
+                div$ = $("#task" + userId);
+                div$.append('<li>' + name + '：' + str + '</li>');
+            }
+            var userInfo = function (userName) {
+                $('#userinfo>h2').text('用户名：' + userName);
+                $('#userinfo').removeClass('hide-it');
+                $('#form').addClass('hide-it');
+            }
+            var bindSend = function () {
+                $('#send').bind('click', function () {
+                    var userId = $('select[name=userId]').val();
+                    sendHtml(userId, $("option[value=" + userId + "]").text(), $('input[name=str]').val(),true);
+                    userTaskHub.server.sendMessage(userId, _userName, $('input[name=str]').val())
+                });
+            }
+            var tashStart = function () {
+                $(".taskText").attr('id', "task" + _userId);
+                userInfo(_userName);
+                userTaskHub.server.login(_userId);
+                $.get("GetUserInfo").done(function (data1) {
+                    var json1 = JSON.parse(data1);
+                    $.each(json1, function (index, item) {
+                        $('select[name=userId]').append("<option value=" + item.UserId + ">" + item.UserName + "</option>");
+                    });
+                    bindSend();
+                });
+            }
+            $.connection.hub.start().done(function (data,data1) {
+                var bindClick = function () {
+                    if (_userId != "") {
+                        tashStart();
+                    }else {
+                        $('#submit').bind('click', function () {
+                            $.post("Login", { userId: $('input[name=userId]').val(), password: $('input[name=password]').val() }).done(function (data) {
+                                window.location.href = window.location.href;
+                                if (data != '') {
+                                    var json = JSON.parse(data);
+                                    _userId = json.UserId;
+                                    _userName = json.UserName;
+                                    tashStart();
+                                }
+                            });
+                        });
+                    }
+                }();
+                
+
+            });
+        });
+    </script>
+</body>
+</html>
